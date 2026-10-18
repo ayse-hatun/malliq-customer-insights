@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MallIQ — Customer Segment Predictor</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
+
+:root{
+  --bg:#f5f7fb;
+  --card:#fff;
+  --ink:#172033;
+  --muted:#6e7890;
+  --line:#e4e9f1;
+  --brand:#365cf5;
+  --brand-dark:#2948ce;
+  --brand-soft:#edf1ff;
+  --success:#169b70;
+  --success-soft:#e9f8f2;
+  --danger:#d64b5c;
+  --shadow:0 18px 50px rgba(30,45,80,.08);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  min-height:100vh;
+  font-family:"DM Sans",sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 10% 10%, #eef2ff 0, transparent 28%),
+    radial-gradient(circle at 90% 20%, #edf9f5 0, transparent 24%),
+    var(--bg);
+}
+
+button,input{font:inherit}
+
+.page{
+  width:min(1080px,calc(100% - 32px));
+  margin:auto;
+  padding:28px 0 48px;
+}
+
+nav{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:42px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:11px;
+}
+
+.logo{
+  width:42px;
+  height:42px;
+  border-radius:13px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,#4169ff,#7658f4);
+  color:#fff;
+  font:800 17px "Manrope",sans-serif;
+  box-shadow:0 8px 20px rgba(54,92,245,.22);
+}
+
+.brand h2{
+  font:800 19px "Manrope",sans-serif;
+  line-height:1.05;
+}
+.brand p{
+  font-size:10.5px;
+  color:var(--muted);
+  margin-top:3px;
+}
+
+.status{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:9px 13px;
+  font-size:11.5px;
+  color:var(--muted);
+}
+
+.dot{
+  width:8px;
+  height:8px;
+  background:#28c58d;
+  border-radius:50%;
+}
+
+.hero{
+  text-align:center;
+  margin:0 auto 30px;
+  max-width:680px;
+}
+
+.eyebrow{
+  color:var(--brand);
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+}
+
+.hero h1{
+  font:800 clamp(30px,5vw,47px)/1.12 "Manrope",sans-serif;
+  margin:10px 0 12px;
+  letter-spacing:-.035em;
+}
+
+.hero p{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.65;
+}
+
+.app{
+  display:grid;
+  grid-template-columns:minmax(300px,.82fr) minmax(370px,1.18fr);
+  gap:18px;
+  align-items:stretch;
+}
+
+.card{
+  background:rgba(255,255,255,.94);
+  border:1px solid var(--line);
+  border-radius:20px;
+  box-shadow:var(--shadow);
+}
+
+.input-card{
+  padding:25px;
+}
+
+.card-label{
+  font-size:10.5px;
+  font-weight:800;
+  letter-spacing:.08em;
+  color:var(--brand);
+  text-transform:uppercase;
+}
+
+.input-card h2,
+.result-head h2{
+  font:800 21px "Manrope",sans-serif;
+  margin:7px 0 5px;
+}
+
+.lead{
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.55;
+}
+
+.form{
+  margin-top:25px;
+}
+
+.field{
+  margin-bottom:20px;
+}
+
+.field-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:8px;
+}
+
+.field label{
+  font-size:12.5px;
+  font-weight:700;
+}
+
+.range{
+  font-size:10px;
+  color:var(--muted);
+}
+
+.input-shell{
+  height:51px;
+  border:1px solid #dce2ec;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  padding:0 13px;
+  background:#fff;
+  transition:.18s ease;
+}
+
+.input-shell:focus-within{
+  border-color:var(--brand);
+  box-shadow:0 0 0 4px rgba(54,92,245,.09);
+}
+
+.input-shell span{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.input-shell input{
+  flex:1;
+  min-width:0;
+  border:0;
+  outline:0;
+  background:transparent;
+  padding:0 10px;
+  color:var(--ink);
+  font-size:15px;
+  font-weight:700;
+}
+
+.helper{
+  margin-top:7px;
+  font-size:10.5px;
+  color:var(--muted);
+}
+
+.error{
+  display:none;
+  color:var(--danger);
+  background:#fff1f3;
+  border:1px solid #ffd8de;
+  border-radius:10px;
+  padding:10px 12px;
+  margin-bottom:14px;
+  font-size:11.5px;
+}
+
+.error.show{display:block}
+
+.primary{
+  width:100%;
+  height:50px;
+  border:0;
+  border-radius:12px;
+  background:var(--brand);
+  color:#fff;
+  font-weight:800;
+  font-size:13px;
+  cursor:pointer;
+  transition:.18s ease;
+}
+
+.primary:hover{
+  background:var(--brand-dark);
+  transform:translateY(-1px);
+}
+
+.primary:disabled{
+  opacity:.65;
+  cursor:wait;
+  transform:none;
+}
+
+.result-card{
+  position:relative;
+  overflow:hidden;
+  min-height:420px;
+}
+
+.empty{
+  height:100%;
+  min-height:420px;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  padding:36px;
+}
+
+.empty-icon{
+  width:78px;
+  height:78px;
+  margin:0 auto 15px;
+  border-radius:24px;
+  display:grid;
+  place-items:center;
+  background:var(--brand-soft);
+  color:var(--brand);
+  font-size:30px;
+  transform:rotate(-3deg);
+}
+
+.empty h3{
+  font:800 18px "Manrope",sans-serif;
+  margin-bottom:7px;
+}
+
+.empty p{
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.6;
+  max-width:300px;
+}
+
+.result{
+  padding:27px;
+}
+
+.hidden{display:none!important}
+
+.result-head{
+  border-bottom:1px solid var(--line);
+  padding-bottom:18px;
+}
+
+.complete{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  background:var(--success-soft);
+  color:var(--success);
+  border-radius:999px;
+  padding:7px 10px;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+
+.segment-name{
+  font:800 30px/1.15 "Manrope",sans-serif;
+  margin:20px 0 7px;
+  letter-spacing:-.03em;
+}
+
+.profile{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  background:var(--brand-soft);
+  color:var(--brand);
+  border-radius:9px;
+  padding:8px 10px;
+  font-size:11px;
+  font-weight:800;
+}
+
+.description{
+  color:var(--muted);
+  font-size:12.5px;
+  line-height:1.65;
+  margin-top:14px;
+  max-width:520px;
+}
+
+.values{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:19px 0;
+}
+
+.value{
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#fafbfe;
+  padding:13px;
+}
+
+.value span{
+  display:block;
+  color:var(--muted);
+  font-size:10px;
+  margin-bottom:5px;
+}
+
+.value strong{
+  font:800 17px "Manrope",sans-serif;
+}
+
+.insight{
+  background:#f8fafc;
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:14px;
+}
+
+.insight-title{
+  font-size:10.5px;
+  color:var(--muted);
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+  margin-bottom:6px;
+}
+
+.insight p{
+  font-size:12px;
+  line-height:1.55;
+}
+
+.model-note{
+  margin-top:16px;
+  color:#8a93a5;
+  font-size:9.5px;
+  line-height:1.5;
+}
+
+footer{
+  text-align:center;
+  margin-top:22px;
+  color:#8b95a8;
+  font-size:10.5px;
+}
+
+@media(max-width:780px){
+  .app{grid-template-columns:1fr}
+  .hero{margin-bottom:22px}
+  nav{margin-bottom:30px}
+}
+
+@media(max-width:500px){
+  .page{width:min(100% - 20px,1080px);padding-top:18px}
+  .status{display:none}
+  .input-card,.result{padding:20px}
+  .values{grid-template-columns:1fr}
+  .hero h1{font-size:29px}
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <nav>
+    <div class="brand">
+      <div class="logo">M</div>
+      <div>
+        <h2>MallIQ</h2>
+        <p>Customer Intelligence</p>
+      </div>
+    </div>
+
+    <div class="status">
+      <span class="dot"></span>
+      <span id="modelStatus">Model online</span>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="eyebrow">Customer Segmentation</div>
+    <h1>Know your customer in seconds.</h1>
+    <p>Enter income and spending behavior to understand which customer group they most closely match.</p>
+  </section>
+
+  <main class="app">
+    <section class="card input-card">
+      <div class="card-label">Customer details</div>
+      <h2>Analyze a customer</h2>
+      <p class="lead">Only two values are needed.</p>
+
+      <form id="predictionForm" class="form" novalidate>
+        <div class="field">
+          <div class="field-top">
+            <label for="income">Annual income</label>
+            <span class="range">15–137 k$</span>
+          </div>
+
+          <div class="input-shell">
+            <span>$</span>
+            <input id="income" type="number" min="15" max="137" step="0.1" placeholder="70" required>
+            <span>k / year</span>
+          </div>
+
+          <div class="helper">Example: 70 means $70,000 per year.</div>
+        </div>
+
+        <div class="field">
+          <div class="field-top">
+            <label for="spending">Spending score</label>
+            <span class="range">1–100</span>
+          </div>
+
+          <div class="input-shell">
+            <span>◎</span>
+            <input id="spending" type="number" min="1" max="100" step="1" placeholder="70" required>
+            <span>/ 100</span>
+          </div>
+
+          <div class="helper">Higher score means stronger spending behavior.</div>
+        </div>
+
+        <div id="errorMessage" class="error"></div>
+
+        <button id="predictBtn" class="primary" type="submit">
+          <span id="buttonText">Analyze customer →</span>
+        </button>
+      </form>
+    </section>
+
+    <section class="card result-card">
+      <div id="emptyState" class="empty">
+        <div>
+          <div class="empty-icon">◎</div>
+          <h3>Your result will appear here</h3>
+          <p>Enter the customer's income and spending score to see a meaningful customer segment.</p>
+        </div>
+      </div>
+
+      <div id="resultContent" class="result hidden">
+        <div class="result-head">
+          <div class="complete"><span class="dot"></span>Analysis complete</div>
+
+          <div id="segmentName" class="segment-name">High-Value Customer</div>
+          <div id="profile" class="profile">High Income · High Spending</div>
+
+          <p id="description" class="description"></p>
+        </div>
+
+        <div class="values">
+          <div class="value">
+            <span>Annual income</span>
+            <strong id="resultIncome">--</strong>
+          </div>
+          <div class="value">
+            <span>Spending score</span>
+            <strong id="resultSpending">--</strong>
+          </div>
+        </div>
+
+        <div class="insight">
+          <div class="insight-title">Business interpretation</div>
+          <p id="suggestion"></p>
+        </div>
+
+        <div class="model-note">
+          Segment interpretation is based on the trained Decision Tree output. Business suggestions are descriptive guidance, not model predictions.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>Decision Tree customer segmentation demo · Flask + Python</footer>
+</div>
+
+<script>
+const form = document.getElementById("predictionForm");
+const incomeInput = document.getElementById("income");
+const spendingInput = document.getElementById("spending");
+const predictBtn = document.getElementById("predictBtn");
+const buttonText = document.getElementById("buttonText");
+const errorMessage = document.getElementById("errorMessage");
+const emptyState = document.getElementById("emptyState");
+const resultContent = document.getElementById("resultContent");
+
+function showError(message){
+  errorMessage.textContent = message;
+  errorMessage.classList.add("show");
+}
+
+function clearError(){
+  errorMessage.textContent = "";
+  errorMessage.classList.remove("show");
+}
+
+async function checkModel(){
+  try{
+    const response = await fetch("/api/health");
+    if(!response.ok) throw new Error();
+    document.getElementById("modelStatus").textContent = "Model online";
+  }catch(e){
+    document.getElementById("modelStatus").textContent = "Backend offline";
+  }
+}
+
+form.addEventListener("submit", async (event)=>{
+  event.preventDefault();
+  clearError();
+
+  const income = Number(incomeInput.value);
+  const spending = Number(spendingInput.value);
+
+  if(!Number.isFinite(income) || income < 15 || income > 137){
+    showError("Enter annual income between 15 and 137 k$.");
+    incomeInput.focus();
+    return;
+  }
+
+  if(!Number.isFinite(spending) || spending < 1 || spending > 100){
+    showError("Enter a spending score between 1 and 100.");
+    spendingInput.focus();
+    return;
+  }
+
+  predictBtn.disabled = true;
+  buttonText.textContent = "Analyzing…";
+
+  try{
+    const response = await fetch("/predict", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        annual_income:income,
+        spending_score:spending
+      })
+    });
+
+    const type = response.headers.get("content-type") || "";
+    if(!type.includes("application/json")){
+      throw new Error(`Unexpected backend response (HTTP ${response.status}).`);
+    }
+
+    const result = await response.json();
+
+    if(!response.ok){
+      throw new Error(result.error || "Prediction failed.");
+    }
+
+    const p = result.prediction;
+
+    document.getElementById("segmentName").textContent = p.name;
+    document.getElementById("profile").textContent = p.profile;
+    document.getElementById("description").textContent = p.description;
+    document.getElementById("suggestion").textContent = p.suggestion;
+    document.getElementById("resultIncome").textContent = "$" + income + "k";
+    document.getElementById("resultSpending").textContent = spending + " / 100";
+
+    emptyState.classList.add("hidden");
+    resultContent.classList.remove("hidden");
+
+  }catch(error){
+    showError(error.message);
+  }finally{
+    predictBtn.disabled = false;
+    buttonText.textContent = "Analyze customer →";
+  }
+});
+
+checkModel();
+</script>
+</body>
+</html>
